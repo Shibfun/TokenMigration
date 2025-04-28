@@ -258,7 +258,7 @@
         </div>
         <div class="dog-section">
             <img src="https://raw.githubusercontent.com/Shibfun/ChainBridge/refs/heads/main/images/shiba.gif" alt="Shiba Dog">
-            <div class="dog-message" id="dogMessage">"Woof! Connect your wallet to create or manage tokens, pup!"</div>
+            <div class="dog-message" id="dogMessage">"Woof! Connect your wallet to start bridging, pup!"</div>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/web3@1.7.0/dist/web3.min.js"></script>
@@ -283,8 +283,8 @@
             {"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"}
         ];
         const erc20Abi = [
-            {"inputs":[{"internalType":"address","name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-            {"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"}
+            {"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"type":"function"},
+            {"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"}],"name":"approve","outputs":[{"name":"success","type":"bool"}],"type":"function"}
         ];
 
         const chains = {
@@ -415,7 +415,7 @@
             if (!web3 || !account) return;
             try {
                 const tokens = await factoryContract.methods.getTokensByOwner(account).call();
-                const latestTokens = tokens.slice(-10).reverse(); // Get latest 10 tokens
+                const latestTokens = tokens.slice(-10).reverse();
                 const list = document.getElementById('createdTokensList');
                 list.innerHTML = '';
                 if (latestTokens.length === 0) {
@@ -446,7 +446,7 @@
             if (!web3 || !account || !web3.utils.isAddress(tokenAddress)) return;
             try {
                 tokenContract = new web3.eth.Contract(tokenAbi, tokenAddress);
-                const underlyingTokenAddress = bizony tokenContract.methods.underlyingToken().call();
+                const underlyingTokenAddress = await tokenContract.methods.underlyingToken().call();
                 underlyingContract = new web3.eth.Contract(erc20Abi, underlyingTokenAddress);
 
                 const underlyingBalanceRaw = await underlyingContract.methods.balanceOf(account).call();
@@ -493,10 +493,15 @@
         async function approveToken(tokenAddress, amount) {
             const tokenContract = new web3.eth.Contract(erc20Abi, tokenAddress);
             const allowance = await tokenContract.methods.allowance(account, tokenAddress).call();
+            console.log(`Current allowance: ${web3.utils.fromWei(allowance, 'ether')}, Required: ${web3.utils.fromWei(amount, 'ether')}`);
             if (web3.utils.toBN(allowance).lt(web3.utils.toBN(amount))) {
+                console.log(`Approving unlimited amount for ${tokenAddress}`);
                 const maxUint256 = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
                 const approveTx = await tokenContract.methods.approve(tokenAddress, maxUint256).send({ from: account, gas: web3.utils.toHex(100000) });
+                console.log(`Approval transaction hash: ${approveTx.transactionHash}`);
                 await waitForTransaction(approveTx.transactionHash);
+            } else {
+                console.log("Sufficient allowance already exists");
             }
         }
 
@@ -506,7 +511,7 @@
             const dogMessage = document.getElementById('dogMessage');
 
             if (!web3 || !account) {
-                status.innerText  = "Please connect wallet first.";
+                status.innerText = "Please connect wallet first.";
                 dogMessage.innerText = getRandomMessage('connectFail');
                 return;
             }
@@ -702,7 +707,7 @@
         }
 
         document.getElementById('connectWalletButton').addEventListener('click', initializeWeb3);
-        document.getElementById('tokenAddress').addEventListener('input', async ()28 {
+        document.getElementById('tokenAddress').addEventListener('input', async () => {
             const tokenAddress = document.getElementById('tokenAddress').value.trim();
             await updateTokenInfo(tokenAddress);
         });
