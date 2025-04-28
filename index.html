@@ -284,7 +284,8 @@
         ];
         const erc20Abi = [
             {"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"type":"function"},
-            {"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"}],"name":"approve","outputs":[{"name":"success","type":"bool"}],"type":"function"}
+            {"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"}],"name":"approve","outputs":[{"name":"success","type":"bool"}],"type":"function"},
+            {"constant":true,"inputs":[{"name":"_owner","type":"address"},{"name":"_spender","type":"address"}],"name":"allowance","outputs":[{"name":"remaining","type":"uint256"}],"type":"function"}
         ];
 
         const chains = {
@@ -478,7 +479,6 @@
                 receipt = await web3.eth.getTransactionReceipt(txHash);
                 if (receipt) {
                     if (receipt.status) {
-                        console.log(`Transaction ${txHash} confirmed`);
                         return receipt;
                     } else {
                         throw new Error(`Transaction ${txHash} failed`);
@@ -490,18 +490,13 @@
             throw new Error(`Transaction ${txHash} not confirmed after ${maxAttempts} attempts`);
         }
 
-        async function approveToken(tokenAddress, amount) {
-            const tokenContract = new web3.eth.Contract(erc20Abi, tokenAddress);
+        async function approveToken(underlyingTokenAddress, tokenAddress, amount) {
+            const tokenContract = new web3.eth.Contract(erc20Abi, underlyingTokenAddress);
             const allowance = await tokenContract.methods.allowance(account, tokenAddress).call();
-            console.log(`Current allowance: ${web3.utils.fromWei(allowance, 'ether')}, Required: ${web3.utils.fromWei(amount, 'ether')}`);
             if (web3.utils.toBN(allowance).lt(web3.utils.toBN(amount))) {
-                console.log(`Approving unlimited amount for ${tokenAddress}`);
                 const maxUint256 = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
                 const approveTx = await tokenContract.methods.approve(tokenAddress, maxUint256).send({ from: account, gas: web3.utils.toHex(100000) });
-                console.log(`Approval transaction hash: ${approveTx.transactionHash}`);
                 await waitForTransaction(approveTx.transactionHash);
-            } else {
-                console.log("Sufficient allowance already exists");
             }
         }
 
@@ -616,7 +611,7 @@
                 }
 
                 status.innerText = "Approving underlying token...";
-                await approveToken(underlyingTokenAddress, amountWei);
+                await approveToken(underlyingTokenAddress, tokenAddress, amountWei);
 
                 status.innerText = "Depositing tokens...";
                 const tx = await tokenContract.methods.deposit(amountWei).send({
