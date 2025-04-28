@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Woofswap - Token Factory & Management</title>
+    <title>Snowball - Token Management</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -125,38 +125,16 @@
             color: var(--primary-color);
             text-align: center;
         }
-        .token-info, .created-tokens {
+        .token-info {
             background: var(--input-bg);
             padding: 15px;
             border-radius: var(--border-radius);
             margin-bottom: 15px;
         }
-        .token-info p, .created-tokens p {
+        .token-info p {
             font-size: 0.9em;
             margin-bottom: 5px;
         }
-        .created-tokens ul {
-            list-style: none;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        .created-tokens li {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 5px 0;
-            font-size: 0.9em;
-        }
-        .copy-button {
-            padding: 5px 10px;
-            background: #4a4f7a;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            color: var(--text-color);
-            font-size: 0.8em;
-        }
-        .copy-button:hover { background: #5a5f8a; }
         .dog-section {
             text-align: center;
             margin-top: 20px;
@@ -183,110 +161,113 @@
 </head>
 <body>
     <div class="container">
-        <div class="header">Woofswap - Token Factory & Management</div>
+        <div class="header">Snowball - Token Management</div>
         <div class="connect-section">
             <button id="connectWalletButton">Connect Wallet</button>
             <div id="networkStatus" class="status">Click to connect...</div>
         </div>
         <div class="input-box">
-            <label>Create New Token</label>
-            <div class="input-box">
-                <label for="tokenName">Token Name</label>
-                <input type="text" id="tokenName" placeholder="e.g., Wrapped BONE">
+            <label>Token Info</label>
+            <div class="token-info">
+                <p>Name: Snow Ball</p>
+                <p>Symbol: SNOW</p>
+                <p id="totalSupply">Total Supply: 0</p>
+                <p id="myBalance">My Balance: 0</p>
             </div>
-            <div class="input-box">
-                <label for="tokenSymbol">Token Symbol</label>
-                <input type="text" id="tokenSymbol" placeholder="e.g., WBONE">
-            </div>
-            <div class="input-box">
-                <label for="maxSupply">Max Supply</label>
-                <input type="number" id="maxSupply" placeholder="e.g., 1000000" step="0.01">
-            </div>
-            <div class="input-box">
-                <label for="underlyingToken">Underlying Token Address</label>
-                <input type="text" id="underlyingToken" placeholder="e.g., 0x...">
-            </div>
-            <button class="action-button" id="createButton" onclick="createToken()">Create Token</button>
-        </div>
-        <div class="created-tokens">
-            <label>Your Created Tokens (Latest 10)</label>
-            <ul id="createdTokensList"></ul>
         </div>
         <div class="input-box">
-            <label>Manage Token</label>
-            <div class="input-box">
-                <label for="tokenAddress">Token Address</label>
-                <input type="text" id="tokenAddress" placeholder="e.g., 0x...">
-            </div>
-            <div class="token-info" id="tokenInfo" style="display: none;">
-                <p id="tokenInfoName"></p>
-                <p id="tokenInfoSymbol"></p>
-                <p id="tokenInfoMaxSupply"></p>
-                <p id="tokenInfoUnderlying"></p>
-                <p id="tokenInfoOwner"></p>
-            </div>
-            <div class="balance-row">
-                <span>Underlying Balance</span>
-                <span id="underlyingBalance">Balance: 0</span>
-            </div>
-            <div class="balance-row">
-                <span>Wrapped Balance</span>
-                <span id="wrappedBalance">Balance: 0</span>
-            </div>
-            <div class="input-box">
-                <label for="depositAmount">Deposit Amount</label>
-                <input type="number" id="depositAmount" placeholder="0.0" step="0.000000000000000001">
-                <div class="percentage-buttons">
-                    <button onclick="setPercentage('deposit', 25)">25%</button>
-                    <button onclick="setPercentage('deposit', 50)">50%</button>
-                    <button onclick="setPercentage('deposit', 75)">75%</button>
-                    <button onclick="setPercentage('deposit', 100)">MAX</button>
-                </div>
-            </div>
+            <label>Balances</label>
+            <div class="balance-row"><span>WOOF</span><span id="woofBalance">Balance: 0</span></div>
+            <div class="balance-row"><span>DAMN</span><span id="damnBalance">Balance: 0</span></div>
+            <div class="balance-row"><span>FEED</span><span id="feedBalance">Balance: 0</span></div>
+            <div class="balance-row"><span>WOW</span><span id="wowBalance">Balance: 0</span></div>
+            <div class="balance-row"><span>SHIPA</span><span id="shipaBalance">Balance: 0</span></div>
+            <div class="balance-row"><span>LUISA</span><span id="luisaBalance">Balance: 0</span></div>
+            <div class="balance-row"><span>CHIKA</span><span id="chikaBalance">Balance: 0</span></div>
+            <div class="balance-row"><span>NONE</span><span id="noneBalance">Balance: 0</span></div>
+        </div>
+        <div class="input-box">
+            <label>Batch Approve</label>
+            <p>Approve all 8 tokens for deposit</p>
+            <button class="action-button" id="batchApproveButton" onclick="batchApprove()">Batch Approve</button>
+        </div>
+        <div class="input-box">
+            <label>Deposit (Mint 100000000 SNOW per Set)</label>
+            <p>Per Set: 200 WOOF, 50000 DAMN, 400000000 FEED, 600000 WOW, 800000 SHIPA, 3000 LUISA, 6000000000 CHIKA, 4000000 NONE</p>
+            <input type="number" id="depositSets" placeholder="Number of sets (e.g., 2)" min="1" step="1">
             <button class="action-button" id="depositButton" onclick="depositToken()">Deposit</button>
-            <div class="input-box">
-                <label for="withdrawAmount">Withdraw Amount</label>
-                <input type="number" id="withdrawAmount" placeholder="0.0" step="0.000000000000000001">
-                <div class="percentage-buttons">
-                    <button onclick="setPercentage('withdraw', 25)">25%</button>
-                    <button onclick="setPercentage('withdraw', 50)">50%</button>
-                    <button onclick="setPercentage('withdraw', 75)">75%</button>
-                    <button onclick="setPercentage('withdraw', 100)">MAX</button>
-                </div>
+        </div>
+        <div class="input-box">
+            <label>Withdraw (Burn 100000000 SNOW per Set)</label>
+            <input type="number" id="withdrawAmount" placeholder="100000000" min="100000000" step="100000000">
+            <div class="percentage-buttons">
+                <button onclick="setPercentage(25)">25%</button>
+                <button onclick="setPercentage(50)">50%</button>
+                <button onclick="setPercentage(75)">75%</button>
+                <button onclick="setPercentage(100)">MAX</button>
             </div>
             <button class="action-button" id="withdrawButton" onclick="withdrawToken()">Withdraw</button>
         </div>
         <div class="dog-section">
             <img src="https://raw.githubusercontent.com/Shibfun/ChainBridge/refs/heads/main/images/shiba.gif" alt="Shiba Dog">
-            <div class="dog-message" id="dogMessage">"Woof! Connect your wallet to start bridging, pup!"</div>
+            <div class="dog-message" id="dogMessage">"Woof! Connect your wallet to mint or burn SNOW, pup!"</div>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/web3@1.7.0/dist/web3.min.js"></script>
     <script>
-        const factoryAddress = '0xE930a70e6055Af321Cc948DB9Ded5b9df08b5a8A';
-        const factoryAbi = [
-            {"inputs":[{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"symbol","type":"string"},{"internalType":"uint256","name":"maxSupply","type":"uint256"},{"internalType":"address","name":"underlyingToken","type":"address"}],"name":"createToken","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"nonpayable","type":"function"},
-            {"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"getTokensByOwner","outputs":[{"components":[{"internalType":"address","name":"tokenAddress","type":"address"},{"internalType":"address","name":"owner","type":"address"},{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"symbol","type":"string"},{"internalType":"uint256","name":"maxSupply","type":"uint256"},{"internalType":"address","name":"underlyingToken","type":"address"},{"internalType":"uint256","name":"createdAt","type":"uint256"}],"internalType":"struct TokenFactory.TokenInfo[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},
-            {"inputs":[{"internalType":"uint256","name":"limit","type":"uint256"}],"name":"getLatestTokens","outputs":[{"components":[{"internalType":"address","name":"tokenAddress","type":"address"},{"internalType":"address","name":"owner","type":"address"},{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"symbol","type":"string"},{"internalType":"uint256","name":"maxSupply","type":"uint256"},{"internalType":"address","name":"underlyingToken","type":"address"},{"internalType":"uint256","name":"createdAt","type":"uint256"}],"internalType":"struct TokenFactory.TokenInfo[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},
-            {"inputs":[],"name":"getAllTokens","outputs":[{"components":[{"internalType":"address","name":"tokenAddress","type":"address"},{"internalType":"address","name":"owner","type":"address"},{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"symbol","type":"string"},{"internalType":"uint256","name":"maxSupply","type":"uint256"},{"internalType":"address","name":"underlyingToken","type":"address"},{"internalType":"uint256","name":"createdAt","type":"uint256"}],"internalType":"struct TokenFactory.TokenInfo[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},
-            {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"token","type":"address"},{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"underlying","type":"address"},{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"symbol","type":"string"},{"internalType":"uint256","name":"maxSupply","type":"uint256"}],"name":"TokenCreated","type":"event"}
-        ];
-        const tokenAbi = [
-            {"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"deposit","outputs":[],"stateMutability":"nonpayable","type":"function"},
-            {"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"},
-            {"inputs":[{"internalType":"address","name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-            {"inputs":[],"name":"underlyingToken","outputs":[{"internalType":"contract IERC20","name":"","type":"address"}],"stateMutability":"view","type":"function"},
+        const snowballAddress = '0xEeeD860286668E3110320C6B79071757f23926E4';
+        const snowballAbi = [
+            {"inputs":[],"stateMutability":"nonpayable","type":"constructor"},
+            {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},
+            {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"address[]","name":"tokens","type":"address[]"}],"name":"BatchApprove","type":"event"},
+            {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"outputAmount","type":"uint256"}],"name":"Deposit","type":"event"},
+            {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},
+            {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"outputAmount","type":"uint256"}],"name":"Withdraw","type":"event"},
+            {"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
             {"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"address","name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"batchApprove","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"subtractedValue","type":"uint256"}],"name":"decreaseAllowance","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[],"name":"deposit","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"addedValue","type":"uint256"}],"name":"increaseAllowance","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"inputAmounts","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"inputTokens","outputs":[{"internalType":"contract IERC20","name":"","type":"address"}],"stateMutability":"view","type":"function"},
             {"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
             {"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},
-            {"inputs":[],"name":"maxSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-            {"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"}
+            {"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"}
         ];
         const erc20Abi = [
             {"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"type":"function"},
             {"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"}],"name":"approve","outputs":[{"name":"success","type":"bool"}],"type":"function"},
             {"constant":true,"inputs":[{"name":"_owner","type":"address"},{"name":"_spender","type":"address"}],"name":"allowance","outputs":[{"name":"remaining","type":"uint256"}],"type":"function"}
         ];
+        const tokenAddresses = [
+            '0xD0daa7B6ff1B40d3cc6F0B2Cf7E85cB993D1c834',
+            '0xeCe898EdCc0AF91430603175F945D8de75291c70',
+            '0xe9Cb2D7ADC24Fc59FE00D6C0A0669BDF16805Fe0',
+            '0x8f4b11d923BbAA6206f3Dd3ff84e8e31bafB49b7',
+            '0x632d1FF1fB27d88EDeDB90e70bFC094D7932A0ad',
+            '0x0cCD687CC6F8461170336D8e8cf46A39313DEab9',
+            '0x61CFA29261d8151D39244b8FfCf8DFd2f9DF3839',
+            '0x64E19b6a167878d2483d166212A3c2c68b1eB842'
+        ];
+        const tokenNames = ['WOOF', 'DAMN', 'FEED', 'WOW', 'SHIPA', 'LUISA', 'CHIKA', 'NONE'];
+        const requiredAmounts = [
+            web3.utils.toWei('200', 'ether'),
+            web3.utils.toWei('50000', 'ether'),
+            web3.utils.toWei('400000000', 'ether'),
+            web3.utils.toWei('600000', 'ether'),
+            web3.utils.toWei('800000', 'ether'),
+            web3.utils.toWei('3000', 'ether'),
+            web3.utils.toWei('6000000000', 'ether'),
+            web3.utils.toWei('4000000', 'ether')
+        ];
+        const requiredDisplay = [200, 50000, 400000000, 600000, 800000, 3000, 6000000000, 4000000];
 
         const chains = {
             Shibarium: {
@@ -296,26 +277,26 @@
             }
         };
 
-        let web3, account, factoryContract, tokenContract, underlyingContract;
-        let underlyingBalance = '0', wrappedBalance = '0';
-        const fromChain = 'Shibarium';
+        let web3, account, snowballContract, tokenContracts = [];
+        let snowBalance = '0';
 
         const dogMessages = {
-            connectSuccess: ["Woof! Wallet connected, ready to create or manage, pup!", "Arf! You're in, let's make some tokens!", "Bark! Wallet's ready, time to create!"],
+            connectSuccess: ["Woof! Wallet connected, ready to mint or burn, pup!", "Arf! You're in, let's roll some SNOW!", "Bark! Wallet's ready, time to play!"],
             connectFail: ["Woof! Couldn't connect wallet, try again, pup!", "Arf! Wallet connection failed, give it another go!", "Bark! Something went wrong, check your wallet!"],
-            createStart: ["Woof! Creating your token, hold tight, pup!", "Arf! Building your new token now!", "Bark! Token creation in progress!"],
-            createSuccess: ["Woof! Token created, you're a token master, pup!", "Arf! New token deployed, check it out!", "Bark! Success! Your token is live!"],
-            createFail: ["Woof! Token creation failed, check inputs, pup!", "Arf! Something went wrong, try again!", "Bark! Creation hit a snag, review and retry!"],
-            createNoInput: ["Woof! Fill in all fields to create, pup!", "Arf! Can't create with empty fields!", "Bark! Need all details to make a token!"],
-            depositStart: ["Woof! Depositing your tokens, hold tight, pup!", "Arf! Wrapping your tokens now!", "Bark! Deposit in progress!"],
-            depositSuccess: ["Woof! Deposit complete, tokens wrapped, pup!", "Arf! Your tokens are now wrapped!", "Bark! Success! Wrapped tokens ready!"],
-            depositFail: ["Woof! Deposit failed, check details, pup!", "Arf! Something went wrong, try again!", "Bark! Deposit hit a snag, retry!"],
-            withdrawStart: ["Woof! Withdrawing your tokens, hold tight, pup!", "Arf! Unwrapping your tokens now!", "Bark! Withdrawal in progress!"],
-            withdrawSuccess: ["Woof! Withdrawal complete, tokens unwrapped, pup!", "Arf! Your tokens are back!", "Bark! Success! Tokens withdrawn!"],
-            withdrawFail: ["Woof! Withdrawal failed, check details, pup!", "Arf! Something went wrong, try again!", "Bark! Withdrawal hit a snag, retry!"],
-            noAmount: ["Woof! Enter an amount to deposit or withdraw, pup!", "Arf! Can't process nothing, pick an amount!", "Bark! Need an amount to proceed!"],
-            userDenied: ["Woof! You canceled the transaction, pup!", "Arf! Transaction denied, try again when ready!", "Bark! You said no, let's try that again!"],
-            invalidToken: ["Woof! Invalid token address, check it, pup!", "Arf! That token doesn't exist, try another!", "Bark! Bad token address, fix it!"]
+            connectDenied: ["Woof! You denied the connection, pup!", "Arf! Connection rejected, try again!", "Bark! Wallet access denied, let's retry!"],
+            noMetaMask: ["Woof! MetaMask not found, install it, pup!", "Arf! No MetaMask detected, get it ready!", "Bark! Need MetaMask to proceed!"],
+            approveStart: ["Woof! Approving tokens, hold tight, pup!", "Arf! Setting up token approvals now!", "Bark! Approval in progress!"],
+            approveSuccess: ["Woof! Tokens approved, ready to deposit, pup!", "Arf! All tokens approved, let's mint!", "Bark! Success! Tokens ready!"],
+            approveFail: ["Woof! Approval failed, check details, pup!", "Arf! Something went wrong, try again!", "Bark! Approval hit a snag, retry!"],
+            depositStart: ["Woof! Minting your SNOW, hold tight, pup!", "Arf! Rolling your snowball now!", "Bark! Deposit in progress!"],
+            depositSuccess: ["Woof! SNOW minted, you're rolling, pup!", "Arf! Your snowball is ready!", "Bark! Success! SNOW minted!"],
+            depositFail: ["Woof! Deposit failed, check tokens, pup!", "Arf! Something went wrong, try again!", "Bark! Deposit hit a snag, retry!"],
+            withdrawStart: ["Woof! Burning your SNOW, hold tight, pup!", "Arf! Unrolling your snowball now!", "Bark! Withdrawal in progress!"],
+            withdrawSuccess: ["Woof! SNOW burned, tokens returned, pup!", "Arf! Your tokens are back!", "Bark! Success! Withdrawal complete!"],
+            withdrawFail: ["Woof! Withdrawal failed, check balance, pup!", "Arf! Something went wrong, try again!", "Bark! Withdrawal hit a snag, retry!"],
+            noAmount: ["Woof! Enter a valid amount (multiple of 100000000), pup!", "Arf! Can't process that, pick a valid amount!", "Bark! Need a multiple of 100000000 to proceed!"],
+            noSets: ["Woof! Enter a valid number of sets (1 or more), pup!", "Arf! Can't deposit nothing, pick a number!", "Bark! Need a set count to proceed!"],
+            userDenied: ["Woof! You canceled the transaction, pup!", "Arf! Transaction denied, try again when ready!", "Bark! You said no, let's try that again!"]
         };
 
         function getRandomMessage(type) {
@@ -331,19 +312,24 @@
                     const accounts = await web3.eth.getAccounts();
                     account = accounts[0];
                     document.getElementById('connectWalletButton').innerText = `Connected: ${account.slice(0, 6)}...${account.slice(-4)}`;
-                    await switchNetwork(fromChain);
+                    await switchNetwork('Shibarium');
                     await initializeContracts();
-                    await updateCreatedTokens();
-                    document.getElementById('networkStatus').innerText = `Connected to ${fromChain}`;
+                    await updateBalances();
+                    document.getElementById('networkStatus').innerText = 'Connected to Shibarium';
                     document.getElementById('dogMessage').innerText = getRandomMessage('connectSuccess');
                 } catch (error) {
-                    document.getElementById('networkStatus').innerText = 'Failed to connect wallet';
-                    document.getElementById('dogMessage').innerText = getRandomMessage('connectFail');
-                    console.error("Wallet connection error:", error);
+                    if (error.code === 4001) {
+                        document.getElementById('networkStatus').innerText = 'User denied wallet connection';
+                        document.getElementById('dogMessage').innerText = getRandomMessage('connectDenied');
+                    } else {
+                        document.getElementById('networkStatus').innerText = 'Failed to connect wallet';
+                        document.getElementById('dogMessage').innerText = getRandomMessage('connectFail');
+                        console.error("Wallet connection error:", error);
+                    }
                 }
             } else {
                 document.getElementById('networkStatus').innerText = 'Please install MetaMask';
-                document.getElementById('dogMessage').innerText = 'Woof! MetaMask not found, pup!';
+                document.getElementById('dogMessage').innerText = getRandomMessage('noMetaMask');
             }
         }
 
@@ -367,108 +353,45 @@
                         }]
                     });
                 } else {
+                    document.getElementById('networkStatus').innerText = 'Failed to switch network';
+                    document.getElementById('dogMessage').innerText = getRandomMessage('connectFail');
                     throw switchError;
                 }
             }
-            await initializeContracts();
         }
 
         async function initializeContracts() {
-            factoryContract = new web3.eth.Contract(factoryAbi, factoryAddress);
-            tokenContract = null;
-            underlyingContract = null;
-            document.getElementById('underlyingBalance').innerText = 'Balance: 0';
-            document.getElementById('wrappedBalance').innerText = 'Balance: 0';
-            document.getElementById('tokenInfo').style.display = 'none';
+            snowballContract = new web3.eth.Contract(snowballAbi, snowballAddress);
+            tokenContracts = tokenAddresses.map(address => new web3.eth.Contract(erc20Abi, address));
+            const totalSupply = await snowballContract.methods.totalSupply().call();
+            document.getElementById('totalSupply').innerText = `Total Supply: ${parseInt(web3.utils.fromWei(totalSupply, 'ether'))}`;
         }
 
-        async function updateTokenInfo(tokenAddress) {
-            if (!web3 || !web3.utils.isAddress(tokenAddress)) {
-                document.getElementById('tokenInfo').style.display = 'none';
-                document.getElementById('underlyingBalance').innerText = 'Balance: 0';
-                document.getElementById('wrappedBalance').innerText = 'Balance: 0';
-                return;
-            }
-            try {
-                tokenContract = new web3.eth.Contract(tokenAbi, tokenAddress);
-                const [name, symbol, maxSupply, underlyingToken, owner] = await Promise.all([
-                    tokenContract.methods.name().call(),
-                    tokenContract.methods.symbol().call(),
-                    tokenContract.methods.maxSupply().call(),
-                    tokenContract.methods.underlyingToken().call(),
-                    tokenContract.methods.owner().call()
-                ]);
-                document.getElementById('tokenInfoName').innerText = `Name: ${name}`;
-                document.getElementById('tokenInfoSymbol').innerText = `Symbol: ${symbol}`;
-                document.getElementById('tokenInfoMaxSupply').innerText = `Max Supply: ${web3.utils.fromWei(maxSupply, 'ether')}`;
-                document.getElementById('tokenInfoUnderlying').innerText = `Underlying Token: ${underlyingToken}`;
-                document.getElementById('tokenInfoOwner').innerText = `Owner: ${owner}`;
-                document.getElementById('tokenInfo').style.display = 'block';
-                await updateBalances(tokenAddress);
-            } catch (error) {
-                document.getElementById('tokenInfo').style.display = 'none';
-                document.getElementById('dogMessage').innerText = getRandomMessage('invalidToken');
-                console.error("Token info error:", error);
-            }
-        }
-
-        async function updateCreatedTokens() {
+        async function updateBalances() {
             if (!web3 || !account) return;
             try {
-                const tokens = await factoryContract.methods.getTokensByOwner(account).call();
-                const latestTokens = tokens.slice(-10).reverse();
-                const list = document.getElementById('createdTokensList');
-                list.innerHTML = '';
-                if (latestTokens.length === 0) {
-                    list.innerHTML = '<li>No tokens created yet.</li>';
-                    return;
-                }
-                latestTokens.forEach(token => {
-                    const li = document.createElement('li');
-                    li.innerText = `${token.name} (${token.symbol}): ${token.tokenAddress.slice(0, 6)}...${token.tokenAddress.slice(-4)}`;
-                    const copyButton = document.createElement('button');
-                    copyButton.className = 'copy-button';
-                    copyButton.innerText = 'Copy';
-                    copyButton.onclick = () => {
-                        navigator.clipboard.writeText(token.tokenAddress);
-                        copyButton.innerText = 'Copied!';
-                        setTimeout(() => copyButton.innerText = 'Copy', 2000);
-                    };
-                    li.appendChild(copyButton);
-                    list.appendChild(li);
+                const snowBalanceRaw = await snowballContract.methods.balanceOf(account).call();
+                snowBalance = web3.utils.fromWei(snowBalanceRaw, 'ether');
+                document.getElementById('myBalance').innerText = `My Balance: ${parseInt(snowBalance)}`;
+                const balances = await Promise.all(tokenContracts.map(contract => contract.methods.balanceOf(account).call()));
+                const balanceElements = ['woofBalance', 'damnBalance', 'feedBalance', 'wowBalance', 'shipaBalance', 'luisaBalance', 'chikaBalance', 'noneBalance'];
+                balances.forEach((balance, i) => {
+                    document.getElementById(balanceElements[i]).innerText = `Balance: ${parseInt(web3.utils.fromWei(balance, 'ether'))}`;
                 });
             } catch (error) {
-                document.getElementById('createdTokensList').innerHTML = '<li>Error loading tokens.</li>';
-                console.error("Created tokens error:", error);
-            }
-        }
-
-        async function updateBalances(tokenAddress) {
-            if (!web3 || !account || !web3.utils.isAddress(tokenAddress)) return;
-            try {
-                tokenContract = new web3.eth.Contract(tokenAbi, tokenAddress);
-                const underlyingTokenAddress = await tokenContract.methods.underlyingToken().call();
-                underlyingContract = new web3.eth.Contract(erc20Abi, underlyingTokenAddress);
-
-                const underlyingBalanceRaw = await underlyingContract.methods.balanceOf(account).call();
-                underlyingBalance = web3.utils.fromWei(underlyingBalanceRaw, 'ether');
-                document.getElementById('underlyingBalance').innerText = `Balance: ${parseFloat(underlyingBalance).toFixed(4)}`;
-
-                const wrappedBalanceRaw = await tokenContract.methods.balanceOf(account).call();
-                wrappedBalance = web3.utils.fromWei(wrappedBalanceRaw, 'ether');
-                document.getElementById('wrappedBalance').innerText = `Balance: ${parseFloat(wrappedBalance).toFixed(4)}`;
-            } catch (error) {
-                document.getElementById('underlyingBalance').innerText = 'Balance: Error';
-                document.getElementById('wrappedBalance').innerText = 'Balance: Error';
                 console.error("Balance update error:", error);
+                document.getElementById('myBalance').innerText = 'My Balance: Error';
+                ['woofBalance', 'damnBalance', 'feedBalance', 'wowBalance', 'shipaBalance', 'luisaBalance', 'chikaBalance', 'noneBalance'].forEach(id => {
+                    document.getElementById(id).innerText = 'Balance: Error';
+                });
             }
         }
 
-        async function setPercentage(type, percentage) {
-            const balance = type === 'deposit' ? underlyingBalance : wrappedBalance;
-            if (!balance) return;
-            const amount = (parseFloat(balance) * percentage) / 100;
-            document.getElementById(`${type}Amount`).value = amount.toFixed(18);
+        async function setPercentage(percentage) {
+            if (!snowBalance) return;
+            const amount = (parseFloat(snowBalance) * percentage) / 100;
+            const sets = Math.floor(amount / 100000000) * 100000000;
+            document.getElementById('withdrawAmount').value = sets;
         }
 
         async function waitForTransaction(txHash) {
@@ -478,11 +401,8 @@
             while (attempts < maxAttempts) {
                 receipt = await web3.eth.getTransactionReceipt(txHash);
                 if (receipt) {
-                    if (receipt.status) {
-                        return receipt;
-                    } else {
-                        throw new Error(`Transaction ${txHash} failed`);
-                    }
+                    if (receipt.status) return receipt;
+                    throw new Error(`Transaction ${txHash} failed`);
                 }
                 await new Promise(resolve => setTimeout(resolve, 2000));
                 attempts++;
@@ -490,19 +410,9 @@
             throw new Error(`Transaction ${txHash} not confirmed after ${maxAttempts} attempts`);
         }
 
-        async function approveToken(underlyingTokenAddress, tokenAddress, amount) {
-            const tokenContract = new web3.eth.Contract(erc20Abi, underlyingTokenAddress);
-            const allowance = await tokenContract.methods.allowance(account, tokenAddress).call();
-            if (web3.utils.toBN(allowance).lt(web3.utils.toBN(amount))) {
-                const maxUint256 = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
-                const approveTx = await tokenContract.methods.approve(tokenAddress, maxUint256).send({ from: account, gas: web3.utils.toHex(100000) });
-                await waitForTransaction(approveTx.transactionHash);
-            }
-        }
-
-        async function createToken() {
+        async function batchApprove() {
             const status = document.getElementById('networkStatus');
-            const createButton = document.getElementById('createButton');
+            const batchApproveButton = document.getElementById('batchApproveButton');
             const dogMessage = document.getElementById('dogMessage');
 
             if (!web3 || !account) {
@@ -511,59 +421,30 @@
                 return;
             }
 
-            const name = document.getElementById('tokenName').value.trim();
-            const symbol = document.getElementById('tokenSymbol').value.trim();
-            const maxSupply = parseFloat(document.getElementById('maxSupply').value);
-            const underlyingToken = document.getElementById('underlyingToken').value.trim();
-
-            if (!name || !symbol || !maxSupply || !underlyingToken) {
-                status.innerText = "Please fill in all fields.";
-                dogMessage.innerText = getRandomMessage('createNoInput');
-                return;
-            }
-
-            if (!web3.utils.isAddress(underlyingToken)) {
-                status.innerText = "Invalid underlying token address.";
-                dogMessage.innerText = "Woof! That address doesn’t smell right, pup!";
-                return;
-            }
-
-            if (isNaN(maxSupply) || maxSupply <= 0) {
-                status.innerText = "Invalid max supply.";
-                dogMessage.innerText = "Woof! Max supply must be a positive number, pup!";
-                return;
-            }
-
             try {
-                createButton.disabled = true;
-                status.innerText = "Creating token...";
-                dogMessage.innerText = getRandomMessage('createStart');
+                batchApproveButton.disabled = true;
+                status.innerText = "Approving tokens...";
+                dogMessage.innerText = getRandomMessage('approveStart');
 
-                const maxSupplyWei = web3.utils.toWei(maxSupply.toString(), 'ether');
-                const tx = await factoryContract.methods.createToken(name, symbol, maxSupplyWei, underlyingToken).send({
+                const tx = await snowballContract.methods.batchApprove().send({
                     from: account,
-                    gas: web3.utils.toHex(3000000)
+                    gas: web3.utils.toHex(500000)
                 });
 
-                const receipt = await waitForTransaction(tx.transactionHash);
-                const tokenAddress = receipt.events.TokenCreated.returnValues.token;
-
-                status.innerText = `Token created! Address: ${tokenAddress}`;
-                dogMessage.innerText = getRandomMessage('createSuccess');
-                document.getElementById('tokenAddress').value = tokenAddress;
-                await updateTokenInfo(tokenAddress);
-                await updateCreatedTokens();
+                await waitForTransaction(tx.transactionHash);
+                status.innerText = "All tokens approved!";
+                dogMessage.innerText = getRandomMessage('approveSuccess');
             } catch (error) {
                 if (error.code === 4001) {
                     status.innerText = "Transaction canceled by user.";
                     dogMessage.innerText = getRandomMessage('userDenied');
                 } else {
-                    status.innerText = "Token creation failed.";
-                    dogMessage.innerText = getRandomMessage('createFail');
-                    console.error("Creation error:", error);
+                    status.innerText = "Approval failed.";
+                    dogMessage.innerText = getRandomMessage('approveFail');
+                    console.error("Approval error:", error);
                 }
             } finally {
-                createButton.disabled = false;
+                batchApproveButton.disabled = false;
             }
         }
 
@@ -578,51 +459,41 @@
                 return;
             }
 
-            const tokenAddress = document.getElementById('tokenAddress').value.trim();
-            const amount = parseFloat(document.getElementById('depositAmount').value);
-
-            if (!tokenAddress || !web3.utils.isAddress(tokenAddress)) {
-                status.innerText = "Invalid token address.";
-                dogMessage.innerText = getRandomMessage('invalidToken');
-                return;
-            }
-
-            if (!amount || isNaN(amount) || amount <= 0) {
-                status.innerText = "Please enter a valid deposit amount.";
-                dogMessage.innerText = getRandomMessage('noAmount');
+            const sets = parseInt(document.getElementById('depositSets').value);
+            if (!sets || sets <= 0) {
+                status.innerText = "Please enter a valid number of sets.";
+                dogMessage.innerText = getRandomMessage('noSets');
                 return;
             }
 
             try {
                 depositButton.disabled = true;
-                status.innerText = "Initializing token contract...";
+                status.innerText = "Checking balances...";
                 dogMessage.innerText = getRandomMessage('depositStart');
 
-                tokenContract = new web3.eth.Contract(tokenAbi, tokenAddress);
-                const underlyingTokenAddress = await tokenContract.methods.underlyingToken().call();
-                underlyingContract = new web3.eth.Contract(erc20Abi, underlyingTokenAddress);
-
-                const amountWei = web3.utils.toWei(amount.toString(), 'ether');
-                const balanceRaw = await underlyingContract.methods.balanceOf(account).call();
-                if (web3.utils.toBN(balanceRaw).lt(web3.utils.toBN(amountWei))) {
-                    status.innerText = "Insufficient underlying token balance.";
-                    dogMessage.innerText = "Woof! Not enough underlying tokens, pup!";
-                    return;
+                const balances = await Promise.all(tokenContracts.map(contract => contract.methods.balanceOf(account).call()));
+                for (let i = 0; i < balances.length; i++) {
+                    const required = web3.utils.toBN(requiredAmounts[i]).mul(web3.utils.toBN(sets));
+                    if (web3.utils.toBN(balances[i]).lt(required)) {
+                        status.innerText = `Insufficient ${tokenNames[i]} balance for ${sets} sets.`;
+                        dogMessage.innerText = `Woof! Not enough ${tokenNames[i]} for ${sets} sets, pup!`;
+                        return;
+                    }
                 }
 
-                status.innerText = "Approving underlying token...";
-                await approveToken(underlyingTokenAddress, tokenAddress, amountWei);
+                status.innerText = `Minting ${sets * 100000000} SNOW...`;
+                for (let i = 0; i < sets; i++) {
+                    const tx = await snowballContract.methods.deposit().send({
+                        from: account,
+                        gas: web3.utils.toHex(300000)
+                    });
+                    await waitForTransaction(tx.transactionHash);
+                }
 
-                status.innerText = "Depositing tokens...";
-                const tx = await tokenContract.methods.deposit(amountWei).send({
-                    from: account,
-                    gas: web3.utils.toHex(200000)
-                });
-
-                await waitForTransaction(tx.transactionHash);
-                status.innerText = "Deposit successful!";
+                status.innerText = `Deposited ${sets} sets successfully!`;
                 dogMessage.innerText = getRandomMessage('depositSuccess');
-                await updateBalances(tokenAddress);
+                await updateBalances();
+                await initializeContracts();
             } catch (error) {
                 if (error.code === 4001) {
                     status.innerText = "Transaction canceled by user.";
@@ -648,45 +519,37 @@
                 return;
             }
 
-            const tokenAddress = document.getElementById('tokenAddress').value.trim();
             const amount = parseFloat(document.getElementById('withdrawAmount').value);
-
-            if (!tokenAddress || !web3.utils.isAddress(tokenAddress)) {
-                status.innerText = "Invalid token address.";
-                dogMessage.innerText = getRandomMessage('invalidToken');
-                return;
-            }
-
-            if (!amount || isNaN(amount) || amount <= 0) {
-                status.innerText = "Please enter a valid withdraw amount.";
+            if (!amount || amount <= 0 || amount % 100000000 !== 0) {
+                status.innerText = "Please enter a valid amount (multiple of 100000000).";
                 dogMessage.innerText = getRandomMessage('noAmount');
                 return;
             }
 
             try {
                 withdrawButton.disabled = true;
-                status.innerText = "Initializing token contract...";
+                status.innerText = "Checking balance...";
                 dogMessage.innerText = getRandomMessage('withdrawStart');
 
-                tokenContract = new web3.eth.Contract(tokenAbi, tokenAddress);
+                const balanceRaw = await snowballContract.methods.balanceOf(account).call();
                 const amountWei = web3.utils.toWei(amount.toString(), 'ether');
-                const balanceRaw = await tokenContract.methods.balanceOf(account).call();
                 if (web3.utils.toBN(balanceRaw).lt(web3.utils.toBN(amountWei))) {
-                    status.innerText = "Insufficient wrapped token balance.";
-                    dogMessage.innerText = "Woof! Not enough wrapped tokens, pup!";
+                    status.innerText = "Insufficient SNOW balance.";
+                    dogMessage.innerText = "Woof! Not enough SNOW, pup!";
                     return;
                 }
 
-                status.innerText = "Withdrawing tokens...";
-                const tx = await tokenContract.methods.withdraw(amountWei).send({
+                status.innerText = `Burning ${amount} SNOW...`;
+                const tx = await snowballContract.methods.withdraw(amountWei).send({
                     from: account,
-                    gas: web3.utils.toHex(200000)
+                    gas: web3.utils.toHex(300000)
                 });
 
                 await waitForTransaction(tx.transactionHash);
                 status.innerText = "Withdrawal successful!";
                 dogMessage.innerText = getRandomMessage('withdrawSuccess');
-                await updateBalances(tokenAddress);
+                await updateBalances();
+                await initializeContracts();
             } catch (error) {
                 if (error.code === 4001) {
                     status.innerText = "Transaction canceled by user.";
@@ -702,10 +565,6 @@
         }
 
         document.getElementById('connectWalletButton').addEventListener('click', initializeWeb3);
-        document.getElementById('tokenAddress').addEventListener('input', async () => {
-            const tokenAddress = document.getElementById('tokenAddress').value.trim();
-            await updateTokenInfo(tokenAddress);
-        });
     </script>
 </body>
 </html>
