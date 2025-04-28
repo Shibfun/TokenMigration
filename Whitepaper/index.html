@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Woofswap Token Factory Whitepaper</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #ff9100;
+            --secondary-color: #ff6f61;
+            --gradient-bg: linear-gradient(180deg, #1e1e2f 0%, #2a2a3d 100%);
+            --card-bg: #2c2f48;
+            --text-color: #ffffff;
+            --border-radius: 15px;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--gradient-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .header img {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .nav {
+            background: var(--input-bg);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+        }
+        .nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .nav a:hover {
+            color: var(--primary-color);
+        }
+        .section {
+            margin-bottom: 40px;
+        }
+        .section h2 {
+            font-size: 1.8em;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        .section p {
+            font-size: 1em;
+            margin-bottom: 15px;
+        }
+        .section ul {
+            list-style: disc;
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+        .section li {
+            margin-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #4a4f7a;
+            text-align: left;
+        }
+        th {
+            background: var(--primary-color);
+            color: var(--text-color);
+        }
+        td {
+            background: #373b5c;
+        }
+        .footer {
+            text-align: center;
+            font-size: 0.9em;
+            color: #aaaaaa;
+            margin-top: 40px;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            .header h1 {
+                font-size: 2em;
+            }
+            .nav ul {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .section h2 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="https://raw.githubusercontent.com/Shibfun/ChainBridge/refs/heads/main/images/shiba.gif" alt="Woofswap Logo">
+            <h1>Woofswap Token Factory Whitepaper</h1>
+        </div>
+        <div class="nav">
+            <ul>
+                <li><a href="#introduction">Introduction</a></li>
+                <li><a href="#technical">Technical Architecture</a></li>
+                <li><a href="#usecases">Use Cases</a></li>
+                <li><a href="#features">Key Features</a></li>
+                <li><a href="#future">Future Optimizations</a></li>
+                <li><a href="#conclusion">Conclusion</a></li>
+            </ul>
+        </div>
+        <div class="section" id="introduction">
+            <h2>Introduction</h2>
+            <p>Woofswap Token Factory is a decentralized platform built on the Shibarium blockchain, enabling users to create, manage, and wrap tokens seamlessly. Leveraging Shibarium's low-cost and high-speed infrastructure, Woofswap empowers developers, communities, and businesses to tokenize assets with ease.</p>
+            <p>Our mission is to democratize token creation, making it accessible to anyone with a MetaMask wallet. The platform supports wrapping existing ERC-20 tokens into new tokens with customizable parameters, fostering innovation in DeFi, gaming, and community-driven projects.</p>
+        </div>
+        <div class="section" id="technical">
+            <h2>Technical Architecture</h2>
+            <p>The Woofswap Token Factory consists of a smart contract deployed on Shibarium (address: <a href="https://shibariumscan.io/address/0xE930a70e6055Af321Cc948DB9Ded5b9df08b5a8A" target="_blank">0xE930a70e6055Af321Cc948DB9Ded5b9df08b5a8A</a>) and a user-friendly frontend interface.</p>
+            <h3>Smart Contract</h3>
+            <ul>
+                <li><strong>Token Factory Contract</strong>: Allows users to create new ERC-20 tokens by specifying name, symbol, max supply, and underlying token address.</li>
+                <li><strong>Token Contract</strong>: Manages wrapped tokens with deposit (mint) and withdraw (burn) functions, maintaining a 1:1 peg with the underlying token.</li>
+                <li><strong>Query Functions</strong>: Supports querying tokens by owner and retrieving the latest 10 created tokens.</li>
+            </ul>
+            <h3>Frontend Interface</h3>
+            <ul>
+                <li><strong>Create Token</strong>: Users input token details and deploy new tokens via MetaMask.</li>
+                <li><strong>Manage Token</strong>: Deposit or withdraw tokens, with real-time balance updates.</li>
+                <li><strong>Token Info</strong>: Displays token metadata (name, symbol, max supply, etc.) by entering a token address.</li>
+                <li><strong>Created Tokens</strong>: Lists the latest 10 tokens created by the user, with copyable addresses.</li>
+            </ul>
+            <h3>Network Integration</h3>
+            <p>Built on Shibarium (Chain ID: 109), Woofswap uses MetaMask for secure wallet connections. The platform ensures low transaction fees and fast confirmations, ideal for tokenization.</p>
+        </div>
+        <div class="section" id="usecases">
+            <h2>Use Cases</h2>
+            <p>Woofswap Token Factory unlocks a wide range of applications:</p>
+            <table>
+                <tr>
+                    <th>Use Case</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>Asset Tokenization</td>
+                    <td>Wrap existing tokens (e.g., BONE) into new tokens for specific ecosystems, such as in-game currencies or DeFi protocols.</td>
+                </tr>
+                <tr>
+                    <td>Community Tokens</td>
+                    <td>Create tokens for communities or projects to incentivize participation, reward contributors, or fund initiatives.</td>
+                </tr>
+                <tr>
+                    <td>Cross-Chain Bridge</td>
+                    <td>Extend wrapped tokens to other chains (e.g., Base) via cross-chain bridges, enhancing interoperability.</td>
+                </tr>
+                <tr>
+                    <td>DeFi Integration</td>
+                    <td>Issue tokens for liquidity pools, staking, or yield farming in decentralized finance applications.</td>
+                </tr>
+                <tr>
+                    <td>NFT and Metaverse</td>
+                    <td>Develop exclusive tokens for NFT marketplaces or virtual worlds, enabling unique economic systems.</td>
+                </tr>
+                <tr>
+                    <td>DAO Governance</td>
+                    <td>Launch governance tokens for decentralized autonomous organizations, facilitating community-driven decisions.</td>
+                </tr>
+            </table>
+        </div>
+        <div class="section" id="features">
+            <h2>Key Features</h2>
+            <ul>
+                <li><strong>Token Creation</strong>: Deploy ERC-20 tokens with customizable name, symbol, and max supply.</li>
+                <li><strong>Deposit/Withdraw</strong>: Wrap and unwrap tokens with a 1:1 peg, supported by percentage-based input (25%, 50%, 75%, MAX).</li>
+                <li><strong>Token Query</strong>: Retrieve metadata and balances for any token created by the factory.</li>
+                <li><strong>User Dashboard</strong>: View the latest 10 tokens created by the user, with one-click address copying.</li>
+                <li><strong>Shibarium Efficiency</strong>: Low-cost transactions and fast confirmations on Shibarium.</li>
+                <li><strong>Security</strong>: Non-custodial, with all operations executed via MetaMask.</li>
+            </ul>
+        </div>
+        <div class="section" id="future">
+            <h2>Future Optimizations</h2>
+            <p>To enhance Woofswap Token Factory, we propose the following improvements:</p>
+            <ul>
+                <li><strong>Batch Operations</strong>: Enable bulk deposits and withdrawals for multiple tokens.</li>
+                <li><strong>Token Search</strong>: Add filtering and search for created tokens by name or symbol.</li>
+                <li><strong>Event Notifications</strong>: Implement real-time alerts for token creation and transactions.</li>
+                <li><strong>Multi-Language Support</strong>: Localize the interface for global accessibility.</li>
+                <li><strong>Explorer Integration</strong>: Link token addresses to Shibariumscan for transparent transaction tracking.</li>
+            </ul>
+        </div>
+        <div class="section" id="conclusion">
+            <h2>Conclusion</h2>
+            <p>Woofswap Token Factory is a powerful tool for tokenization on Shibarium, offering simplicity, flexibility, and scalability. By enabling anyone to create and manage tokens, it paves the way for innovative applications in DeFi, gaming, and community governance. We invite developers and communities to join us in building the future of decentralized ecosystems.</p>
+        </div>
+        <div class="footer">
+            <p>&copy; 2025 Woofswap Team. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>
