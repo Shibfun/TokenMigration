@@ -32,7 +32,7 @@
         }
         .container {
             width: 100%;
-            max-width: 480px;
+            max-width: 600px;
             background: var(--card-bg);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             border-radius: var(--border-radius);
@@ -125,6 +125,38 @@
             color: var(--primary-color);
             text-align: center;
         }
+        .token-info, .created-tokens {
+            background: var(--input-bg);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 15px;
+        }
+        .token-info p, .created-tokens p {
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        .created-tokens ul {
+            list-style: none;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .created-tokens li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            font-size: 0.9em;
+        }
+        .copy-button {
+            padding: 5px 10px;
+            background: #4a4f7a;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: var(--text-color);
+            font-size: 0.8em;
+        }
+        .copy-button:hover { background: #5a5f8a; }
         .dog-section {
             text-align: center;
             margin-top: 20px;
@@ -176,11 +208,22 @@
             </div>
             <button class="action-button" id="createButton" onclick="createToken()">Create Token</button>
         </div>
+        <div class="created-tokens">
+            <label>Your Created Tokens (Latest 10)</label>
+            <ul id="createdTokensList"></ul>
+        </div>
         <div class="input-box">
             <label>Manage Token</label>
             <div class="input-box">
                 <label for="tokenAddress">Token Address</label>
                 <input type="text" id="tokenAddress" placeholder="e.g., 0x...">
+            </div>
+            <div class="token-info" id="tokenInfo" style="display: none;">
+                <p id="tokenInfoName"></p>
+                <p id="tokenInfoSymbol"></p>
+                <p id="tokenInfoMaxSupply"></p>
+                <p id="tokenInfoUnderlying"></p>
+                <p id="tokenInfoOwner"></p>
             </div>
             <div class="balance-row">
                 <span>Underlying Balance</span>
@@ -220,20 +263,24 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/web3@1.7.0/dist/web3.min.js"></script>
     <script>
-        const factoryAddress = '0x70A1D14c3128f7Fa68445e6AAefc12be00493A21';
+        const factoryAddress = '0xE930a70e6055Af321Cc948DB9Ded5b9df08b5a8A';
         const factoryAbi = [
             {"inputs":[{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"symbol","type":"string"},{"internalType":"uint256","name":"maxSupply","type":"uint256"},{"internalType":"address","name":"underlyingToken","type":"address"}],"name":"createToken","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"nonpayable","type":"function"},
-            {"inputs":[],"name":"getTokens","outputs":[{"internalType":"address[]","name":"","type":"address[]"}],"stateMutability":"view","type":"function"},
-            {"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"tokenToUnderlying","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
-            {"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"tokens","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
-            {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"token","type":"address"},{" indexed":true,"internalType":"address","name":"underlying","type":"address"},{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"symbol","type":"string"},{"internalType":"uint256","name":"maxSupply","type":"uint256"}],"name":"TokenCreated","type":"event"}
+            {"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"getTokensByOwner","outputs":[{"components":[{"internalType":"address","name":"tokenAddress","type":"address"},{"internalType":"address","name":"owner","type":"address"},{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"symbol","type":"string"},{"internalType":"uint256","name":"maxSupply","type":"uint256"},{"internalType":"address","name":"underlyingToken","type":"address"},{"internalType":"uint256","name":"createdAt","type":"uint256"}],"internalType":"struct TokenFactory.TokenInfo[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"limit","type":"uint256"}],"name":"getLatestTokens","outputs":[{"components":[{"internalType":"address","name":"tokenAddress","type":"address"},{"internalType":"address","name":"owner","type":"address"},{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"symbol","type":"string"},{"internalType":"uint256","name":"maxSupply","type":"uint256"},{"internalType":"address","name":"underlyingToken","type":"address"},{"internalType":"uint256","name":"createdAt","type":"uint256"}],"internalType":"struct TokenFactory.TokenInfo[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"getAllTokens","outputs":[{"components":[{"internalType":"address","name":"tokenAddress","type":"address"},{"internalType":"address","name":"owner","type":"address"},{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"symbol","type":"string"},{"internalType":"uint256","name":"maxSupply","type":"uint256"},{"internalType":"address","name":"underlyingToken","type":"address"},{"internalType":"uint256","name":"createdAt","type":"uint256"}],"internalType":"struct TokenFactory.TokenInfo[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},
+            {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"token","type":"address"},{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"underlying","type":"address"},{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"symbol","type":"string"},{"internalType":"uint256","name":"maxSupply","type":"uint256"}],"name":"TokenCreated","type":"event"}
         ];
         const tokenAbi = [
             {"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"deposit","outputs":[],"stateMutability":"nonpayable","type":"function"},
             {"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"},
             {"inputs":[{"internalType":"address","name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
             {"inputs":[],"name":"underlyingToken","outputs":[{"internalType":"contract IERC20","name":"","type":"address"}],"stateMutability":"view","type":"function"},
-            {"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"}
+            {"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"maxSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"}
         ];
         const erc20Abi = [
             {"inputs":[{"internalType":"address","name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
@@ -266,7 +313,8 @@
             withdrawSuccess: ["Woof! Withdrawal complete, tokens unwrapped, pup!", "Arf! Your tokens are back!", "Bark! Success! Tokens withdrawn!"],
             withdrawFail: ["Woof! Withdrawal failed, check details, pup!", "Arf! Something went wrong, try again!", "Bark! Withdrawal hit a snag, retry!"],
             noAmount: ["Woof! Enter an amount to deposit or withdraw, pup!", "Arf! Can't process nothing, pick an amount!", "Bark! Need an amount to proceed!"],
-            userDenied: ["Woof! You canceled the transaction, pup!", "Arf! Transaction denied, try again when ready!", "Bark! You said no, let's try that again!"]
+            userDenied: ["Woof! You canceled the transaction, pup!", "Arf! Transaction denied, try again when ready!", "Bark! You said no, let's try that again!"],
+            invalidToken: ["Woof! Invalid token address, check it, pup!", "Arf! That token doesn't exist, try another!", "Bark! Bad token address, fix it!"]
         };
 
         function getRandomMessage(type) {
@@ -284,6 +332,7 @@
                     document.getElementById('connectWalletButton').innerText = `Connected: ${account.slice(0, 6)}...${account.slice(-4)}`;
                     await switchNetwork(fromChain);
                     await initializeContracts();
+                    await updateCreatedTokens();
                     document.getElementById('networkStatus').innerText = `Connected to ${fromChain}`;
                     document.getElementById('dogMessage').innerText = getRandomMessage('connectSuccess');
                 } catch (error) {
@@ -329,13 +378,75 @@
             underlyingContract = null;
             document.getElementById('underlyingBalance').innerText = 'Balance: 0';
             document.getElementById('wrappedBalance').innerText = 'Balance: 0';
+            document.getElementById('tokenInfo').style.display = 'none';
+        }
+
+        async function updateTokenInfo(tokenAddress) {
+            if (!web3 || !web3.utils.isAddress(tokenAddress)) {
+                document.getElementById('tokenInfo').style.display = 'none';
+                document.getElementById('underlyingBalance').innerText = 'Balance: 0';
+                document.getElementById('wrappedBalance').innerText = 'Balance: 0';
+                return;
+            }
+            try {
+                tokenContract = new web3.eth.Contract(tokenAbi, tokenAddress);
+                const [name, symbol, maxSupply, underlyingToken, owner] = await Promise.all([
+                    tokenContract.methods.name().call(),
+                    tokenContract.methods.symbol().call(),
+                    tokenContract.methods.maxSupply().call(),
+                    tokenContract.methods.underlyingToken().call(),
+                    tokenContract.methods.owner().call()
+                ]);
+                document.getElementById('tokenInfoName').innerText = `Name: ${name}`;
+                document.getElementById('tokenInfoSymbol').innerText = `Symbol: ${symbol}`;
+                document.getElementById('tokenInfoMaxSupply').innerText = `Max Supply: ${web3.utils.fromWei(maxSupply, 'ether')}`;
+                document.getElementById('tokenInfoUnderlying').innerText = `Underlying Token: ${underlyingToken}`;
+                document.getElementById('tokenInfoOwner').innerText = `Owner: ${owner}`;
+                document.getElementById('tokenInfo').style.display = 'block';
+                await updateBalances(tokenAddress);
+            } catch (error) {
+                document.getElementById('tokenInfo').style.display = 'none';
+                document.getElementById('dogMessage').innerText = getRandomMessage('invalidToken');
+                console.error("Token info error:", error);
+            }
+        }
+
+        async function updateCreatedTokens() {
+            if (!web3 || !account) return;
+            try {
+                const tokens = await factoryContract.methods.getTokensByOwner(account).call();
+                const latestTokens = tokens.slice(-10).reverse(); // Get latest 10 tokens
+                const list = document.getElementById('createdTokensList');
+                list.innerHTML = '';
+                if (latestTokens.length === 0) {
+                    list.innerHTML = '<li>No tokens created yet.</li>';
+                    return;
+                }
+                latestTokens.forEach(token => {
+                    const li = document.createElement('li');
+                    li.innerText = `${token.name} (${token.symbol}): ${token.tokenAddress.slice(0, 6)}...${token.tokenAddress.slice(-4)}`;
+                    const copyButton = document.createElement('button');
+                    copyButton.className = 'copy-button';
+                    copyButton.innerText = 'Copy';
+                    copyButton.onclick = () => {
+                        navigator.clipboard.writeText(token.tokenAddress);
+                        copyButton.innerText = 'Copied!';
+                        setTimeout(() => copyButton.innerText = 'Copy', 2000);
+                    };
+                    li.appendChild(copyButton);
+                    list.appendChild(li);
+                });
+            } catch (error) {
+                document.getElementById('createdTokensList').innerHTML = '<li>Error loading tokens.</li>';
+                console.error("Created tokens error:", error);
+            }
         }
 
         async function updateBalances(tokenAddress) {
-            if (!web3 || !account || !tokenAddress) return;
+            if (!web3 || !account || !web3.utils.isAddress(tokenAddress)) return;
             try {
                 tokenContract = new web3.eth.Contract(tokenAbi, tokenAddress);
-                const underlyingTokenAddress = await tokenContract.methods.underlyingToken().call();
+                const underlyingTokenAddress = bizony tokenContract.methods.underlyingToken().call();
                 underlyingContract = new web3.eth.Contract(erc20Abi, underlyingTokenAddress);
 
                 const underlyingBalanceRaw = await underlyingContract.methods.balanceOf(account).call();
@@ -395,7 +506,7 @@
             const dogMessage = document.getElementById('dogMessage');
 
             if (!web3 || !account) {
-                status.innerText = "Please connect wallet first.";
+                status.innerText  = "Please connect wallet first.";
                 dogMessage.innerText = getRandomMessage('connectFail');
                 return;
             }
@@ -440,7 +551,8 @@
                 status.innerText = `Token created! Address: ${tokenAddress}`;
                 dogMessage.innerText = getRandomMessage('createSuccess');
                 document.getElementById('tokenAddress').value = tokenAddress;
-                await updateBalances(tokenAddress);
+                await updateTokenInfo(tokenAddress);
+                await updateCreatedTokens();
             } catch (error) {
                 if (error.code === 4001) {
                     status.innerText = "Transaction canceled by user.";
@@ -471,7 +583,7 @@
 
             if (!tokenAddress || !web3.utils.isAddress(tokenAddress)) {
                 status.innerText = "Invalid token address.";
-                dogMessage.innerText = "Woof! That token address doesn’t smell right, pup!";
+                dogMessage.innerText = getRandomMessage('invalidToken');
                 return;
             }
 
@@ -541,7 +653,7 @@
 
             if (!tokenAddress || !web3.utils.isAddress(tokenAddress)) {
                 status.innerText = "Invalid token address.";
-                dogMessage.innerText = "Woof! That token address doesn’t smell right, pup!";
+                dogMessage.innerText = getRandomMessage('invalidToken');
                 return;
             }
 
@@ -590,14 +702,9 @@
         }
 
         document.getElementById('connectWalletButton').addEventListener('click', initializeWeb3);
-        document.getElementById('tokenAddress').addEventListener('input', async () => {
-            const tokenAddress = document.getElementById('clubAddress').value.trim();
-            if (web3.utils.isAddress(tokenAddress)) {
-                await updateBalances(tokenAddress);
-            } else {
-                document.getElementById('underlyingBalance').innerText = 'Balance: 0';
-                document.getElementById('wrappedBalance').innerText = 'Balance: 0';
-            }
+        document.getElementById('tokenAddress').addEventListener('input', async ()28 {
+            const tokenAddress = document.getElementById('tokenAddress').value.trim();
+            await updateTokenInfo(tokenAddress);
         });
     </script>
 </body>
