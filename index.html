@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Woofswap - Token Factory & Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #ff9100;
+            --secondary-color: #ff6f61;
+            --gradient-bg: linear-gradient(180deg, #1e1e2f 0%, #2a2a3d 100%);
+            --card-bg: #2c2f48;
+            --input-bg: #373b5c;
+            --text-color: #ffffff;
+            --border-radius: 15px;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--gradient-bg);
+            color: var(--text-color);
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--card-bg);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border-radius: var(--border-radius);
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(90deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+            padding: 12px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        .connect-section button {
+            padding: 12px;
+            background: var(--primary-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            transition: background 0.2s;
+            margin-bottom: 10px;
+        }
+        .connect-section button:hover { background: #e68a00; }
+        .input-box {
+            background: var(--input-bg);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 15px;
+        }
+        .input-box label {
+            display: block;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            background: var(--input-bg);
+            border: none;
+            border-radius: 10px;
+            color: var(--text-color);
+            font-size: 1em;
+        }
+        .balance-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+            color: #ff9100;
+        }
+        .percentage-buttons {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+        }
+        .percentage-buttons button {
+            padding: 5px 10px;
+            background: #4a4f7a;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: var(--text-color);
+            flex: 1;
+        }
+        .percentage-buttons button:hover { background: #5a5f8a; }
+        .action-button {
+            padding: 15px;
+            background: var(--primary-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            transition: background 0.2s;
+            margin-bottom: 10px;
+        }
+        .action-button:disabled {
+            background: #4a4f7a;
+            cursor: not-allowed;
+        }
+        .action-button:hover:not(:disabled) { background: #e68a00; }
+        .status {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: var(--primary-color);
+            text-align: center;
+        }
+        .dog-section {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .dog-section img {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 10px;
+        }
+        .dog-message {
+            font-size: 0.9em;
+            color: var(--secondary-color);
+            font-style: italic;
+        }
+        @media (max-width: 480px) {
+            body { padding: 10px; }
+            .container { padding: 15px; }
+            .header { font-size: 1.1em; }
+            .percentage-buttons button { padding: 5px; }
+            .dog-section img { width: 50px; height: 50px; }
+            .dog-message { font-size: 0.8em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">Woofswap - Token Factory & Management</div>
+        <div class="connect-section">
+            <button id="connectWalletButton">Connect Wallet</button>
+            <div id="networkStatus" class="status">Click to connect...</div>
+        </div>
+        <div class="input-box">
+            <label>Create New Token</label>
+            <div class="input-box">
+                <label for="tokenName">Token Name</label>
+                <input type="text" id="tokenName" placeholder="e.g., Wrapped BONE">
+            </div>
+            <div class="input-box">
+                <label for="tokenSymbol">Token Symbol</label>
+                <input type="text" id="tokenSymbol" placeholder="e.g., WBONE">
+            </div>
+            <div class="input-box">
+                <label for="maxSupply">Max Supply</label>
+                <input type="number" id="maxSupply" placeholder="e.g., 1000000" step="0.01">
+            </div>
+            <div class="input-box">
+                <label for="underlyingToken">Underlying Token Address</label>
+                <input type="text" id="underlyingToken" placeholder="e.g., 0x...">
+            </div>
+            <button class="action-button" id="createButton" onclick="createToken()">Create Token</button>
+        </div>
+        <div class="input-box">
+            <label>Manage Token</label>
+            <div class="input-box">
+                <label for="tokenAddress">Token Address</label>
+                <input type="text" id="tokenAddress" placeholder="e.g., 0x...">
+            </div>
+            <div class="balance-row">
+                <span>Underlying Balance</span>
+                <span id="underlyingBalance">Balance: 0</span>
+            </div>
+            <div class="balance-row">
+                <span>Wrapped Balance</span>
+                <span id="wrappedBalance">Balance: 0</span>
+            </div>
+            <div class="input-box">
+                <label for="depositAmount">Deposit Amount</label>
+                <input type="number" id="depositAmount" placeholder="0.0" step="0.000000000000000001">
+                <div class="percentage-buttons">
+                    <button onclick="setPercentage('deposit', 25)">25%</button>
+                    <button onclick="setPercentage('deposit', 50)">50%</button>
+                    <button onclick="setPercentage('deposit', 75)">75%</button>
+                    <button onclick="setPercentage('deposit', 100)">MAX</button>
+                </div>
+            </div>
+            <button class="action-button" id="depositButton" onclick="depositToken()">Deposit</button>
+            <div class="input-box">
+                <label for="withdrawAmount">Withdraw Amount</label>
+                <input type="number" id="withdrawAmount" placeholder="0.0" step="0.000000000000000001">
+                <div class="percentage-buttons">
+                    <button onclick="setPercentage('withdraw', 25)">25%</button>
+                    <button onclick="setPercentage('withdraw', 50)">50%</button>
+                    <button onclick="setPercentage('withdraw', 75)">75%</button>
+                    <button onclick="setPercentage('withdraw', 100)">MAX</button>
+                </div>
+            </div>
+            <button class="action-button" id="withdrawButton" onclick="withdrawToken()">Withdraw</button>
+        </div>
+        <div class="dog-section">
+            <img src="https://raw.githubusercontent.com/Shibfun/ChainBridge/refs/heads/main/images/shiba.gif" alt="Shiba Dog">
+            <div class="dog-message" id="dogMessage">"Woof! Connect your wallet to create or manage tokens, pup!"</div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.7.0/dist/web3.min.js"></script>
+    <script>
+        const factoryAddress = '0x70A1D14c3128f7Fa68445e6AAefc12be00493A21';
+        const factoryAbi = [
+            {"inputs":[{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"symbol","type":"string"},{"internalType":"uint256","name":"maxSupply","type":"uint256"},{"internalType":"address","name":"underlyingToken","type":"address"}],"name":"createToken","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[],"name":"getTokens","outputs":[{"internalType":"address[]","name":"","type":"address[]"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"tokenToUnderlying","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"tokens","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
+            {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"token","type":"address"},{" indexed":true,"internalType":"address","name":"underlying","type":"address"},{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"symbol","type":"string"},{"internalType":"uint256","name":"maxSupply","type":"uint256"}],"name":"TokenCreated","type":"event"}
+        ];
+        const tokenAbi = [
+            {"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"deposit","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"address","name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"underlyingToken","outputs":[{"internalType":"contract IERC20","name":"","type":"address"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"}
+        ];
+        const erc20Abi = [
+            {"inputs":[{"internalType":"address","name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"}
+        ];
+
+        const chains = {
+            Shibarium: {
+                chainId: 109,
+                chainName: 'Shibarium',
+                rpcUrl: 'https://rpc.shibariumchain.com'
+            }
+        };
+
+        let web3, account, factoryContract, tokenContract, underlyingContract;
+        let underlyingBalance = '0', wrappedBalance = '0';
+        const fromChain = 'Shibarium';
+
+        const dogMessages = {
+            connectSuccess: ["Woof! Wallet connected, ready to create or manage, pup!", "Arf! You're in, let's make some tokens!", "Bark! Wallet's ready, time to create!"],
+            connectFail: ["Woof! Couldn't connect wallet, try again, pup!", "Arf! Wallet connection failed, give it another go!", "Bark! Something went wrong, check your wallet!"],
+            createStart: ["Woof! Creating your token, hold tight, pup!", "Arf! Building your new token now!", "Bark! Token creation in progress!"],
+            createSuccess: ["Woof! Token created, you're a token master, pup!", "Arf! New token deployed, check it out!", "Bark! Success! Your token is live!"],
+            createFail: ["Woof! Token creation failed, check inputs, pup!", "Arf! Something went wrong, try again!", "Bark! Creation hit a snag, review and retry!"],
+            createNoInput: ["Woof! Fill in all fields to create, pup!", "Arf! Can't create with empty fields!", "Bark! Need all details to make a token!"],
+            depositStart: ["Woof! Depositing your tokens, hold tight, pup!", "Arf! Wrapping your tokens now!", "Bark! Deposit in progress!"],
+            depositSuccess: ["Woof! Deposit complete, tokens wrapped, pup!", "Arf! Your tokens are now wrapped!", "Bark! Success! Wrapped tokens ready!"],
+            depositFail: ["Woof! Deposit failed, check details, pup!", "Arf! Something went wrong, try again!", "Bark! Deposit hit a snag, retry!"],
+            withdrawStart: ["Woof! Withdrawing your tokens, hold tight, pup!", "Arf! Unwrapping your tokens now!", "Bark! Withdrawal in progress!"],
+            withdrawSuccess: ["Woof! Withdrawal complete, tokens unwrapped, pup!", "Arf! Your tokens are back!", "Bark! Success! Tokens withdrawn!"],
+            withdrawFail: ["Woof! Withdrawal failed, check details, pup!", "Arf! Something went wrong, try again!", "Bark! Withdrawal hit a snag, retry!"],
+            noAmount: ["Woof! Enter an amount to deposit or withdraw, pup!", "Arf! Can't process nothing, pick an amount!", "Bark! Need an amount to proceed!"],
+            userDenied: ["Woof! You canceled the transaction, pup!", "Arf! Transaction denied, try again when ready!", "Bark! You said no, let's try that again!"]
+        };
+
+        function getRandomMessage(type) {
+            const messages = dogMessages[type];
+            return messages[Math.floor(Math.random() * messages.length)];
+        }
+
+        async function initializeWeb3() {
+            if (window.ethereum) {
+                web3 = new Web3(window.ethereum);
+                try {
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    const accounts = await web3.eth.getAccounts();
+                    account = accounts[0];
+                    document.getElementById('connectWalletButton').innerText = `Connected: ${account.slice(0, 6)}...${account.slice(-4)}`;
+                    await switchNetwork(fromChain);
+                    await initializeContracts();
+                    document.getElementById('networkStatus').innerText = `Connected to ${fromChain}`;
+                    document.getElementById('dogMessage').innerText = getRandomMessage('connectSuccess');
+                } catch (error) {
+                    document.getElementById('networkStatus').innerText = 'Failed to connect wallet';
+                    document.getElementById('dogMessage').innerText = getRandomMessage('connectFail');
+                    console.error("Wallet connection error:", error);
+                }
+            } else {
+                document.getElementById('networkStatus').innerText = 'Please install MetaMask';
+                document.getElementById('dogMessage').innerText = 'Woof! MetaMask not found, pup!';
+            }
+        }
+
+        async function switchNetwork(chain) {
+            const chainConfig = chains[chain];
+            try {
+                await window.ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: `0x${chainConfig.chainId.toString(16)}` }]
+                });
+            } catch (switchError) {
+                if (switchError.code === 4902) {
+                    await window.ethereum.request({
+                        method: 'wallet_addEthereumChain',
+                        params: [{
+                            chainId: `0x${chainConfig.chainId.toString(16)}`,
+                            chainName: chainConfig.chainName,
+                            rpcUrls: [chainConfig.rpcUrl],
+                            nativeCurrency: { name: chainConfig.chainName, symbol: 'BONE', decimals: 18 },
+                            blockExplorerUrls: ['https://shibariumscan.io']
+                        }]
+                    });
+                } else {
+                    throw switchError;
+                }
+            }
+            await initializeContracts();
+        }
+
+        async function initializeContracts() {
+            factoryContract = new web3.eth.Contract(factoryAbi, factoryAddress);
+            tokenContract = null;
+            underlyingContract = null;
+            document.getElementById('underlyingBalance').innerText = 'Balance: 0';
+            document.getElementById('wrappedBalance').innerText = 'Balance: 0';
+        }
+
+        async function updateBalances(tokenAddress) {
+            if (!web3 || !account || !tokenAddress) return;
+            try {
+                tokenContract = new web3.eth.Contract(tokenAbi, tokenAddress);
+                const underlyingTokenAddress = await tokenContract.methods.underlyingToken().call();
+                underlyingContract = new web3.eth.Contract(erc20Abi, underlyingTokenAddress);
+
+                const underlyingBalanceRaw = await underlyingContract.methods.balanceOf(account).call();
+                underlyingBalance = web3.utils.fromWei(underlyingBalanceRaw, 'ether');
+                document.getElementById('underlyingBalance').innerText = `Balance: ${parseFloat(underlyingBalance).toFixed(4)}`;
+
+                const wrappedBalanceRaw = await tokenContract.methods.balanceOf(account).call();
+                wrappedBalance = web3.utils.fromWei(wrappedBalanceRaw, 'ether');
+                document.getElementById('wrappedBalance').innerText = `Balance: ${parseFloat(wrappedBalance).toFixed(4)}`;
+            } catch (error) {
+                document.getElementById('underlyingBalance').innerText = 'Balance: Error';
+                document.getElementById('wrappedBalance').innerText = 'Balance: Error';
+                console.error("Balance update error:", error);
+            }
+        }
+
+        async function setPercentage(type, percentage) {
+            const balance = type === 'deposit' ? underlyingBalance : wrappedBalance;
+            if (!balance) return;
+            const amount = (parseFloat(balance) * percentage) / 100;
+            document.getElementById(`${type}Amount`).value = amount.toFixed(18);
+        }
+
+        async function waitForTransaction(txHash) {
+            let receipt = null;
+            const maxAttempts = 30;
+            let attempts = 0;
+            while (attempts < maxAttempts) {
+                receipt = await web3.eth.getTransactionReceipt(txHash);
+                if (receipt) {
+                    if (receipt.status) {
+                        console.log(`Transaction ${txHash} confirmed`);
+                        return receipt;
+                    } else {
+                        throw new Error(`Transaction ${txHash} failed`);
+                    }
+                }
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                attempts++;
+            }
+            throw new Error(`Transaction ${txHash} not confirmed after ${maxAttempts} attempts`);
+        }
+
+        async function approveToken(tokenAddress, amount) {
+            const tokenContract = new web3.eth.Contract(erc20Abi, tokenAddress);
+            const allowance = await tokenContract.methods.allowance(account, tokenAddress).call();
+            if (web3.utils.toBN(allowance).lt(web3.utils.toBN(amount))) {
+                const maxUint256 = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+                const approveTx = await tokenContract.methods.approve(tokenAddress, maxUint256).send({ from: account, gas: web3.utils.toHex(100000) });
+                await waitForTransaction(approveTx.transactionHash);
+            }
+        }
+
+        async function createToken() {
+            const status = document.getElementById('networkStatus');
+            const createButton = document.getElementById('createButton');
+            const dogMessage = document.getElementById('dogMessage');
+
+            if (!web3 || !account) {
+                status.innerText = "Please connect wallet first.";
+                dogMessage.innerText = getRandomMessage('connectFail');
+                return;
+            }
+
+            const name = document.getElementById('tokenName').value.trim();
+            const symbol = document.getElementById('tokenSymbol').value.trim();
+            const maxSupply = parseFloat(document.getElementById('maxSupply').value);
+            const underlyingToken = document.getElementById('underlyingToken').value.trim();
+
+            if (!name || !symbol || !maxSupply || !underlyingToken) {
+                status.innerText = "Please fill in all fields.";
+                dogMessage.innerText = getRandomMessage('createNoInput');
+                return;
+            }
+
+            if (!web3.utils.isAddress(underlyingToken)) {
+                status.innerText = "Invalid underlying token address.";
+                dogMessage.innerText = "Woof! That address doesn’t smell right, pup!";
+                return;
+            }
+
+            if (isNaN(maxSupply) || maxSupply <= 0) {
+                status.innerText = "Invalid max supply.";
+                dogMessage.innerText = "Woof! Max supply must be a positive number, pup!";
+                return;
+            }
+
+            try {
+                createButton.disabled = true;
+                status.innerText = "Creating token...";
+                dogMessage.innerText = getRandomMessage('createStart');
+
+                const maxSupplyWei = web3.utils.toWei(maxSupply.toString(), 'ether');
+                const tx = await factoryContract.methods.createToken(name, symbol, maxSupplyWei, underlyingToken).send({
+                    from: account,
+                    gas: web3.utils.toHex(3000000)
+                });
+
+                const receipt = await waitForTransaction(tx.transactionHash);
+                const tokenAddress = receipt.events.TokenCreated.returnValues.token;
+
+                status.innerText = `Token created! Address: ${tokenAddress}`;
+                dogMessage.innerText = getRandomMessage('createSuccess');
+                document.getElementById('tokenAddress').value = tokenAddress;
+                await updateBalances(tokenAddress);
+            } catch (error) {
+                if (error.code === 4001) {
+                    status.innerText = "Transaction canceled by user.";
+                    dogMessage.innerText = getRandomMessage('userDenied');
+                } else {
+                    status.innerText = "Token creation failed.";
+                    dogMessage.innerText = getRandomMessage('createFail');
+                    console.error("Creation error:", error);
+                }
+            } finally {
+                createButton.disabled = false;
+            }
+        }
+
+        async function depositToken() {
+            const status = document.getElementById('networkStatus');
+            const depositButton = document.getElementById('depositButton');
+            const dogMessage = document.getElementById('dogMessage');
+
+            if (!web3 || !account) {
+                status.innerText = "Please connect wallet first.";
+                dogMessage.innerText = getRandomMessage('connectFail');
+                return;
+            }
+
+            const tokenAddress = document.getElementById('tokenAddress').value.trim();
+            const amount = parseFloat(document.getElementById('depositAmount').value);
+
+            if (!tokenAddress || !web3.utils.isAddress(tokenAddress)) {
+                status.innerText = "Invalid token address.";
+                dogMessage.innerText = "Woof! That token address doesn’t smell right, pup!";
+                return;
+            }
+
+            if (!amount || isNaN(amount) || amount <= 0) {
+                status.innerText = "Please enter a valid deposit amount.";
+                dogMessage.innerText = getRandomMessage('noAmount');
+                return;
+            }
+
+            try {
+                depositButton.disabled = true;
+                status.innerText = "Initializing token contract...";
+                dogMessage.innerText = getRandomMessage('depositStart');
+
+                tokenContract = new web3.eth.Contract(tokenAbi, tokenAddress);
+                const underlyingTokenAddress = await tokenContract.methods.underlyingToken().call();
+                underlyingContract = new web3.eth.Contract(erc20Abi, underlyingTokenAddress);
+
+                const amountWei = web3.utils.toWei(amount.toString(), 'ether');
+                const balanceRaw = await underlyingContract.methods.balanceOf(account).call();
+                if (web3.utils.toBN(balanceRaw).lt(web3.utils.toBN(amountWei))) {
+                    status.innerText = "Insufficient underlying token balance.";
+                    dogMessage.innerText = "Woof! Not enough underlying tokens, pup!";
+                    return;
+                }
+
+                status.innerText = "Approving underlying token...";
+                await approveToken(underlyingTokenAddress, amountWei);
+
+                status.innerText = "Depositing tokens...";
+                const tx = await tokenContract.methods.deposit(amountWei).send({
+                    from: account,
+                    gas: web3.utils.toHex(200000)
+                });
+
+                await waitForTransaction(tx.transactionHash);
+                status.innerText = "Deposit successful!";
+                dogMessage.innerText = getRandomMessage('depositSuccess');
+                await updateBalances(tokenAddress);
+            } catch (error) {
+                if (error.code === 4001) {
+                    status.innerText = "Transaction canceled by user.";
+                    dogMessage.innerText = getRandomMessage('userDenied');
+                } else {
+                    status.innerText = "Deposit failed.";
+                    dogMessage.innerText = getRandomMessage('depositFail');
+                    console.error("Deposit error:", error);
+                }
+            } finally {
+                depositButton.disabled = false;
+            }
+        }
+
+        async function withdrawToken() {
+            const status = document.getElementById('networkStatus');
+            const withdrawButton = document.getElementById('withdrawButton');
+            const dogMessage = document.getElementById('dogMessage');
+
+            if (!web3 || !account) {
+                status.innerText = "Please connect wallet first.";
+                dogMessage.innerText = getRandomMessage('connectFail');
+                return;
+            }
+
+            const tokenAddress = document.getElementById('tokenAddress').value.trim();
+            const amount = parseFloat(document.getElementById('withdrawAmount').value);
+
+            if (!tokenAddress || !web3.utils.isAddress(tokenAddress)) {
+                status.innerText = "Invalid token address.";
+                dogMessage.innerText = "Woof! That token address doesn’t smell right, pup!";
+                return;
+            }
+
+            if (!amount || isNaN(amount) || amount <= 0) {
+                status.innerText = "Please enter a valid withdraw amount.";
+                dogMessage.innerText = getRandomMessage('noAmount');
+                return;
+            }
+
+            try {
+                withdrawButton.disabled = true;
+                status.innerText = "Initializing token contract...";
+                dogMessage.innerText = getRandomMessage('withdrawStart');
+
+                tokenContract = new web3.eth.Contract(tokenAbi, tokenAddress);
+                const amountWei = web3.utils.toWei(amount.toString(), 'ether');
+                const balanceRaw = await tokenContract.methods.balanceOf(account).call();
+                if (web3.utils.toBN(balanceRaw).lt(web3.utils.toBN(amountWei))) {
+                    status.innerText = "Insufficient wrapped token balance.";
+                    dogMessage.innerText = "Woof! Not enough wrapped tokens, pup!";
+                    return;
+                }
+
+                status.innerText = "Withdrawing tokens...";
+                const tx = await tokenContract.methods.withdraw(amountWei).send({
+                    from: account,
+                    gas: web3.utils.toHex(200000)
+                });
+
+                await waitForTransaction(tx.transactionHash);
+                status.innerText = "Withdrawal successful!";
+                dogMessage.innerText = getRandomMessage('withdrawSuccess');
+                await updateBalances(tokenAddress);
+            } catch (error) {
+                if (error.code === 4001) {
+                    status.innerText = "Transaction canceled by user.";
+                    dogMessage.innerText = getRandomMessage('userDenied');
+                } else {
+                    status.innerText = "Withdrawal failed.";
+                    dogMessage.innerText = getRandomMessage('withdrawFail');
+                    console.error("Withdrawal error:", error);
+                }
+            } finally {
+                withdrawButton.disabled = false;
+            }
+        }
+
+        document.getElementById('connectWalletButton').addEventListener('click', initializeWeb3);
+        document.getElementById('tokenAddress').addEventListener('input', async () => {
+            const tokenAddress = document.getElementById('clubAddress').value.trim();
+            if (web3.utils.isAddress(tokenAddress)) {
+                await updateBalances(tokenAddress);
+            } else {
+                document.getElementById('underlyingBalance').innerText = 'Balance: 0';
+                document.getElementById('wrappedBalance').innerText = 'Balance: 0';
+            }
+        });
+    </script>
+</body>
+</html>
